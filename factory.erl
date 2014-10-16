@@ -1,5 +1,5 @@
 -module(factory).
--export([spawnFactory/3,spawnLoop/3,test/2,killFactory/0,spawnRobots/4]).
+-export([spawnFactory/3,spawnLoop/3,test/2,killFactory/0]).
 
 % Spawn a factory registered under the name 'factory', which will spawn robots
 % executing the function Module:Name with parameters [DefaultParameters|X] where
