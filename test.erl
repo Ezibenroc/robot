@@ -3,9 +3,15 @@
 -import(factory,[spawnFactory/3]).
 -export([hello/1,spawn_hello/0,first_robot/1,start/3]).
 
+
+% Infinite loop
+loop() ->
+  loop().
+
 % Hello world function
 hello(X) ->
-  io:fwrite("Hello world, I am robot ~s.\n",[X]).
+  io:fwrite("Hello world, I am robot ~s.\n",[X]),
+  loop().
   
 % Create a factory and spawn 10 helloworld robots
 spawn_hello() ->
