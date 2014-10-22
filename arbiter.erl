@@ -5,7 +5,7 @@ startArbiter() -> startArbiter(fun doNothing/4, fun doNothing/4, [], true).
 startArbiter(HandleAction, HandleInfo, InitState, Debug) ->
 	case whereis(arbiter) of
 		undefined -> register(arbiter,spawn(arbiter,arbiterLoop,[HandleAction, HandleInfo, InitState, Debug]));
-		_ -> io:fwrite("<spawnArbiter> Killing old arbiter...~n"), killArbiter(), startArbiter()
+		_ -> io:fwrite("<spawnArbiter> Killing old arbiter...~n"), killArbiter(), startArbiter(HandleAction, HandleInfo, InitState, Debug)
 	end.
 
 debug(OnOff,Message) -> debug(OnOff,Message,[]).
@@ -40,4 +40,4 @@ killArbiter() ->
 		Pid -> exit(Pid,kill)
 	end.
 
-doNothing(_Pid, _Parameters, State, Debug) -> debug(Debug,"<arbiter> Doing nothing. State is ~w.~n",[State]), State.
+doNothing(Pid, _Parameters, State, Debug) -> debug(Debug,"<arbiter> Doing nothing. Pid is ~w. State is ~w.~n",[Pid,State]), State.
