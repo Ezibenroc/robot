@@ -1,4 +1,5 @@
 -module(myLists).
+-include_lib("eunit/include/eunit.hrl").
 -export([set_/4,get_/3,print/1,getMap/0]).
 
 % set_ the N-th cell of the list to X
