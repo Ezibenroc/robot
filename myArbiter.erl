@@ -15,6 +15,7 @@ handleAction(Pid, Params, State, _) ->
             Start = myLists:get_(X1,Y1,State),
             End = myLists:get_(X2,Y2,State),
             if
+            % TODO : check that the coordinates are in the map.
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1)
                     or (Start =/= "r")
                     ->  timer:send_after(250,self(),{arbiterRequest,Pid,action,[handlemove,invalid,[X1,Y1],[X2,Y2]]}), State;
