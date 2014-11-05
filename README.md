@@ -1,4 +1,1 @@
-Test a module `foo`:
-```erlang
-foo:test().
-```
+Test a module `foo` in an erlang shell: `foo:test().`
