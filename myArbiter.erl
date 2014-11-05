@@ -13,9 +13,9 @@
 %   [move,[X1,Y1],[X2,Y2]]
 %   [handlemove,Status,[X1,Y1],[X2,Y2]]
 handleAction(Pid, Params, State, _) ->
-    {Entry,Exit,Map} = case Params of
+    {Entry,Exit,Map} = case State of
         {Entry_,Exit_,Map_} -> {Entry_,Exit_,Map_};
-        _ -> io:fwrite("HandleActions: received wrong formated State.\n"), State
+        Err -> io:fwrite("HandleActions: received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
         % MOVE
@@ -48,7 +48,7 @@ handleAction(Pid, Params, State, _) ->
                 {X,Y} -> {X,Y,myLists:get_(X,Y,Map)};
                 _ -> error
             catch
-                error:function_clause -> {invalid,invalid,invalid};
+                error:function_clause -> {"invalid","invalid","invalid"};
                 X -> X
             end,
         if
@@ -66,7 +66,7 @@ handleAction(Pid, Params, State, _) ->
                 ok -> Pid ! ok, {Entry,Exit,myLists:set_(Xentry,Yentry,"r",Map)}
             end;
         % MISC
-        _ -> io:fwrite("HandleActions: received unknown Params.\n"), State
+        Err2 -> io:fwrite("HandleActions: received unknown Params: ~w.\n",[Err2]), State
     end.
 
 handleInfo(PID,_,State,_) ->

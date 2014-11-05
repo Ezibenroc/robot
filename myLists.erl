@@ -36,4 +36,4 @@ getMap() ->
     ].
 
 getState() ->
-    {[{1,1}],[{3,3}],getMap()}. % Entry points, Exit points, Map
+    {[{3,3}],[{3,6}],getMap()}. % Entry points, Exit points, Map
