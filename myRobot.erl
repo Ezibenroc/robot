@@ -9,10 +9,6 @@
 
 % When one robot receive {terminate_request}, he handle all its last messages, then send an ack and quit.
 
-% Send Mess to all processes of the list.
-multiSend([],_) -> ok;
-multiSend([H|T],Mess) -> H ! Mess, multiSend(T,Mess).
-
 % Function called to start a robot.
 mainRobot([X,Y],Termination,TerminationRequester) ->
     receive

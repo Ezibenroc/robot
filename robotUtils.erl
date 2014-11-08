@@ -14,3 +14,7 @@ allNames() ->
 allPids() -> lists:map(fun (X) -> whereis(X) end, allNames()).
 
 killRobots() -> lists:map(fun (X) -> exit(X,kill) end, allPids()).
+
+% Send Mess to all processes of the list.
+multiSend([],_) -> ok;
+multiSend([H|T],Mess) -> H ! Mess, multiSend(T,Mess).
