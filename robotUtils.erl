@@ -1,5 +1,5 @@
 -module(robotUtils).
--export([allPids/0,allNames/0,killRobots/0]).
+-export([allPids/0,allNames/0,killRobots/0,multiSend/2,broadcast/1]).
 
 allNames() ->
     IsRobot =
@@ -18,3 +18,6 @@ killRobots() -> lists:map(fun (X) -> exit(X,kill) end, allPids()).
 % Send Mess to all processes of the list.
 multiSend([],_) -> ok;
 multiSend([H|T],Mess) -> H ! Mess, multiSend(T,Mess).
+
+% Send Mess to all robots.
+broadcast(Mess) -> multiSend(allPids(),Mess).
