@@ -45,7 +45,7 @@ handleAction(Pid, Params, State, _) ->
         % ENTER
         [enter,EntryPoint,RobotName] ->
         {Xentry,Yentry,EntryState} = try lists:nth(EntryPoint,Entry) of
-                {X,Y} -> {X,Y,myLists:get_(X,Y,Map)};
+                [X,Y] -> {X,Y,myLists:get_(X,Y,Map)};
                 _ -> error
             catch
                 error:function_clause -> {"invalid","invalid","invalid"};
