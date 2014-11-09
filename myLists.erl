@@ -1,6 +1,6 @@
 -module(myLists).
 -include_lib("eunit/include/eunit.hrl").
--export([set_/4,get_/3,print/1,getMap/0,getState/0]).
+-export([set_/4,get_/3,print/1,getMap/0,getState/0,getEntryPoints/0,getExitPoints/0]).
 
 % set_ the N-th cell of the list to X
 % Index begin by 1
@@ -35,5 +35,8 @@ getMap() ->
     ["o","o","o","o","o","o","o","o","r"]
     ].
 
+getEntryPoints() -> [{3,3}].
+getExitPoints() -> [{3,6}].
+
 getState() ->
-    {[{3,3}],[{3,6}],getMap()}. % Entry points, Exit points, Map
+    {getEntryPoints(),getExitPoints(),getMap()}. % Entry points, Exit points, Map
