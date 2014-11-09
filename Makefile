@@ -10,4 +10,4 @@ test:
 	erl -run allTests test
 
 clean : 
-	rm -f *.beam *~
+	rm -f *.beam *.dump *~
