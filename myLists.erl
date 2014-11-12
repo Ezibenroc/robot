@@ -35,8 +35,8 @@ getMap() ->
     ["o","o","o","o","o","o","o","o","r"]
     ].
 
-getEntryPoints() -> [[3,3],[8,2]].
-getExitPoints() -> [[3,6]].
+getEntryPoints() -> [{3,3},{8,2}].
+getExitPoints() -> [{3,6}].
 
 getState() ->
     {getEntryPoints(),getExitPoints(),getMap()}. % Entry points, Exit points, Map
