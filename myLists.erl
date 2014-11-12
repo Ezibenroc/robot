@@ -1,6 +1,6 @@
 -module(myLists).
 -include_lib("eunit/include/eunit.hrl").
--export([set_/4,get_/3,print/1,getMap/0,getState/0,getEntryPoints/0,getExitPoints/0]).
+-export([set_/4,get_/3,print/1,getMap1/0,getState1/0,getState2/0,getEntryPoints/0,getExitPoints/0]).
 
 % set_ the N-th cell of the list to X
 % Index begin by 1
@@ -21,8 +21,8 @@ print([]) -> io:fwrite("\n");
 print([H|T]) -> 
     io:fwrite("~s\n",[lists:foldl(fun(X,Acc) -> string:concat(string:concat(Acc," "),X) end, "", H)]), 
     print(T).
-    
-getMap() ->
+
+getMap1() ->
     [
     ["r","o","x","o","o","o","o","o","o"],
     ["o","o","x","x","o","o","o","o","o"],
@@ -38,5 +38,20 @@ getMap() ->
 getEntryPoints() -> [{3,3},{8,2}].
 getExitPoints() -> [{3,6}].
 
-getState() ->
-    {getEntryPoints(),getExitPoints(),getMap()}. % Entry points, Exit points, Map
+getState1() ->
+    {getEntryPoints(),getExitPoints(),getMap1()}. % Entry points, Exit points, Map
+
+getMap2() ->
+    [
+    ["o","o","x","o","o","o","o","o","o"],
+    ["o","o","x","x","o","o","o","o","o"],
+    ["o","o","o","x","o","o","o","o","o"],
+    ["o","o","o","x","x","o","o","o","o"],
+    ["o","o","o","x","x","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o"],
+    ["o","o","o","o","o","o","o","o","o"]
+    ].
+getState2() ->
+    {getEntryPoints(),getExitPoints(),getMap2()}. % Entry points, Exit points, Map

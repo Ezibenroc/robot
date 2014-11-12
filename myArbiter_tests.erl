@@ -2,7 +2,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 move_test_() ->
-    myArbiter:start(),
+    myArbiter:start(myLists:getState1()),
     arbiter ! {arbiterRequest,self(),action,[move,{1,1},{0,1}]},
     receive OutMap1 -> OutMap1 end,
     arbiter ! {arbiterRequest,self(),action,[move,{1,1},{1,0}]},
@@ -23,10 +23,10 @@ move_test_() ->
     receive X5 -> X5 end,
     arbiter ! {arbiterRequest,self(),info,[debug]},
     receive S1 -> S1 end,
-    [?_assertEqual(invalid, OutMap1),
-    ?_assertEqual(invalid, OutMap2),
-    ?_assertEqual(invalid, OutMap3),
-    ?_assertEqual(invalid, OutMap4),
+    [?_assertEqual(blocked, OutMap1),
+    ?_assertEqual(blocked, OutMap2),
+    ?_assertEqual(blocked, OutMap3),
+    ?_assertEqual(blocked, OutMap4),
     ?_assertEqual(ok, X1),
     ?_assertEqual(invalid, X2),
     ?_assertEqual(blocked, X3),
@@ -36,7 +36,7 @@ move_test_() ->
     ?_assertEqual("r", myLists:get_(1,2,element(3,S1)))].
 
 enter_test_() ->
-    myArbiter:start(),
+    myArbiter:start(myLists:getState1()),
     arbiter ! {arbiterRequest,self(),action,[enter,3,foo]},
     receive X1 -> X1 end,
     arbiter ! {arbiterRequest,self(),action,[enter,1,foo]},

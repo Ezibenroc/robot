@@ -12,6 +12,7 @@
 
 % Function called to start a robot.
 mainRobot(State,{X,Y},TerminationRequester,ID) ->
+%    ?debugVal(State),
     receive
         {PID,terminate_request} -> mainRobot(terminate,{X,Y},[PID|TerminationRequester],ID);
         {entries,ListEntries} -> handleEntries(State,{X,Y},TerminationRequester,ID,ListEntries);
@@ -31,6 +32,7 @@ noMessage(State,{X,Y},TerminationRequester,ID) ->
     case State of
         init -> arbiter ! {arbiterRequest,self(),info,[entry]}, % ask the coordinates of the entry
             mainRobot(State,{X,Y},TerminationRequester,ID) ;
+        normal -> randomWalk(State,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
@@ -46,21 +48,39 @@ handleEntries(State,{X,Y},TerminationRequester,ID,ListEntries) ->
 
 handleOk(State,{X,Y},TerminationRequester,ID) ->
     case State of
-        {arbiterRequest,enter,Entry,ListEntries} -> Pos = lists:nth(Entry,ListEntries),
+        {arbiterRequest,enter,Entry,ListEntries} -> 
+            Pos = lists:nth(Entry,ListEntries),
+%            ?debugMsg("ENTER"),
+            mainRobot(normal,Pos,TerminationRequester,ID);
+        {arbiterRequest,move,Pos} ->
+%            ?debugMsg("MOVE"),
             mainRobot(normal,Pos,TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
 handleInvalid(State,{X,Y},TerminationRequester,ID) ->
     case State of
-        {arbiterRequest,enter,_,_} -> io:fwrite("Unexpected answer.\n"),
+        {arbiterRequest,enter,_,_} ->
+            ?debugMsg("Received invalid in state enter."),
             mainRobot(init,{X,Y},TerminationRequester,ID);
-        _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
+        {arbiterRequest,move,_} ->
+            ?debugMsg("Received invalid in state move."),
+            mainRobot(normal,{X,Y},TerminationRequester,ID);
+        _ -> ?debugMsg("Received invalid in unknown state."),
+            mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
 handleBlocked(State,{X,Y},TerminationRequester,ID) ->
     case State of
-        {arbiterRequest,enter,Entry,_} -> arbiter ! {arbiterRequest,self(),action,[enter,Entry,ID]},
+        {arbiterRequest,enter,Entry,_} -> 
+            arbiter ! {arbiterRequest,self(),action,[enter,Entry,ID]},
             mainRobot(State,{X,Y},TerminationRequester,ID);
+        {arbiterRequest,move,_} ->
+            mainRobot(normal,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
+
+randomWalk(_,{X,Y},TerminationRequester,ID) ->
+    NewPos={X+trunc(random:uniform()*3)-1,Y+trunc(random:uniform()*3)-1},
+    arbiter ! {arbiterRequest,self(),action,[move,{X,Y},NewPos]},
+    mainRobot({arbiterRequest,move,NewPos},{X,Y},TerminationRequester,ID).

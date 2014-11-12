@@ -1,6 +1,6 @@
 -module(myArbiter).
 -import(arbiter,[startArbiter/4]).
--export([handleAction/4,start/0]).
+-export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
 %-define(TIME_MOVE, 250).
 %-define(TIME_ENTER, 1000).
@@ -24,7 +24,7 @@ handleAction(Pid, Params, State, _) ->
             {Start,End} = try {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)} of
                     X -> X
                 catch
-                    error:function_clause ->  {"invalid","invalid"};
+                    error:function_clause ->  {"r","blocked"}; % out of the map, so the robot is blocked
                     X -> X
                 end,
             if
@@ -79,5 +79,5 @@ handleInfo(PID,Params,State,_) ->
         [entry] -> PID ! {entries,Entry}
     end.
 
-start() ->
-    startArbiter(fun handleAction/4, fun handleInfo/4, myLists:getState(), true).
+start(State) ->
+    startArbiter(fun handleAction/4, fun handleInfo/4, State, true).

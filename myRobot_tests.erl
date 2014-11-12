@@ -9,7 +9,7 @@ terminateAck_receive() ->
 % For some unknown reason, eunit perform the test several times in parallel.
 % For instance, if one want to spawn X robots in a test, there might be 2X or 3X robots...
 termination_test_() ->
-    myArbiter:start(),
+    myArbiter:start(myLists:getState2()),
     factory:spawnFactory(myRobot, mainRobot, [init,{-1,-1},[]]),
     factory ! {spawn,10,self()},
     ?debugVal(self()),
