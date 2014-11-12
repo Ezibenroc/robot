@@ -3,5 +3,5 @@
 
 test() ->
     myLists:test(),
-    myArbiter:test().
-%    myRobot:test().
+    myArbiter:test(),
+    myRobot:test().
