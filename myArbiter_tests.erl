@@ -32,7 +32,7 @@ move_test_() ->
     ?_assertEqual(blocked, X3),
     ?_assertEqual(invalid, X4),
     ?_assertEqual(ok, X5),
-    ?_assertEqual("o", myLists:get_(1,1,element(3,S1))),
+    ?_assertEqual(" ", myLists:get_(1,1,element(3,S1))),
     ?_assertEqual("r", myLists:get_(1,2,element(3,S1)))].
 
 enter_test_() ->

@@ -16,23 +16,31 @@ set_(N,M,X,[H|T]) -> [H|set_(N-1,M,X,T)].
 % Get the cell (N,M) of the given map.
 get_(N,M,L) -> lists:nth(M,lists:nth(N,L)).
 
+
 % Print the given map.
-print([]) -> io:fwrite("\n");
-print([H|T]) -> 
-    io:fwrite("~s\n",[lists:foldl(fun(X,Acc) -> string:concat(string:concat(Acc," "),X) end, "", H)]), 
-    print(T).
+printMap([]) -> nope;
+printMap([H|T]) -> 
+    io:fwrite("|~s|\n",[lists:foldl(fun(X,Acc) -> string:concat(string:concat(Acc," "),X) end, "", H)]), 
+    printMap(T).
+print([]) ->
+    io:fwrite("EMPTY MAP\n");
+print([H|T]) ->
+    io:fwrite(" ~s\n",[lists:foldl(fun(_,Acc) -> string:concat(string:concat(Acc,"-"),"-") end, "", H)]),
+    printMap([H|T]),
+    io:fwrite(" ~s\n",[lists:foldl(fun(_,Acc) -> string:concat(string:concat(Acc,"-"),"-") end, "", H)]).
+
 
 getMap1() ->
     [
-    ["r","o","x","o","o","o","o","o","o"],
-    ["o","o","x","x","o","o","o","o","o"],
-    ["o","o","o","x","o","o","o","o","o"],
-    ["o","o","o","x","x","o","o","o","o"],
-    ["o","o","o","x","x","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","r"]
+    ["r"," ","x"," "," "," "," "," "," "],
+    [" "," ","x","x"," "," "," "," "," "],
+    [" "," "," ","x"," "," "," "," "," "],
+    [" "," "," ","x","x"," "," "," "," "],
+    [" "," "," ","x","x"," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "],
+    [" "," "," "," "," "," "," "," ","r"]
     ].
 
 getEntryPoints() -> [{3,3},{8,2}].
@@ -43,15 +51,15 @@ getState1() ->
 
 getMap2() ->
     [
-    ["o","o","x","o","o","o","o","o","o"],
-    ["o","o","x","x","o","o","o","o","o"],
-    ["o","o","o","x","o","o","o","o","o"],
-    ["o","o","o","x","x","o","o","o","o"],
-    ["o","o","o","x","x","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"],
-    ["o","o","o","o","o","o","o","o","o"]
+    [" "," ","x"," "," "," "," "," "," "],
+    [" "," ","x","x"," "," "," "," "," "],
+    [" "," "," ","x"," "," "," "," "," "],
+    [" "," "," ","x","x"," "," "," "," "],
+    [" "," "," ","x","x"," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "],
+    [" "," "," "," "," "," "," "," "," "]
     ].
 getState2() ->
     {getEntryPoints(),getExitPoints(),getMap2()}. % Entry points, Exit points, Map

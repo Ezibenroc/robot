@@ -31,7 +31,7 @@ handleAction(Pid, Params, State, _) ->
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1)
                     or (Start =/= "r")
                     ->  timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,invalid,{X1,Y1},{X2,Y2}]}), State;
-                End =/= "o" 
+                End =/= " "
                     -> timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,blocked,{X1,Y1},{X2,Y2}]}), State;
                 true -> timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,ok,{X1,Y1},{X2,Y2}]}), {Entry,Exit,myLists:set_(X2,Y2,"x",myLists:set_(X1,Y1,"x",Map))}
             end;
@@ -40,7 +40,7 @@ handleAction(Pid, Params, State, _) ->
             case Action of
                 invalid -> Pid ! invalid, State ;
                 blocked -> Pid ! blocked, State ;
-                ok -> Pid ! ok, {Entry,Exit,myLists:set_(X2,Y2,"r",myLists:set_(X1,Y1,"o",Map))}
+                ok -> Pid ! ok, {Entry,Exit,myLists:set_(X2,Y2,"r",myLists:set_(X1,Y1," ",Map))}
             end;
         % ENTER
         [enter,EntryPoint,RobotName] ->
@@ -54,7 +54,7 @@ handleAction(Pid, Params, State, _) ->
         if
             (EntryState =:= "invalid")
                 ->  timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,invalid,{Xentry,Yentry},RobotName]}), State;
-            (EntryState =/= "o")
+            (EntryState =/= " ")
                 -> timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,blocked,{Xentry,Yentry},RobotName]}), State;
             true -> timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,ok,{Xentry,Yentry},RobotName]}), {Entry,Exit,myLists:set_(Xentry,Yentry,"x",Map)}
         end;
