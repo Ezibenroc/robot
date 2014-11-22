@@ -23,7 +23,7 @@ arbiterLoop(HandleAction, HandleInfo, State, Debug) ->
 
     % debug message
     debug(Debug,"<arbiter> Arbiter received request ~w and is in state ~w.~n",[NewRequest,State]),
-
+    myLists:print(element(3,State)),
     % processing the request
     case NewRequest of
         {exit,_} -> done;

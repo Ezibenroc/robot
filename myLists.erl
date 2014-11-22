@@ -16,11 +16,17 @@ set_(N,M,X,[H|T]) -> [H|set_(N-1,M,X,T)].
 % Get the cell (N,M) of the given map.
 get_(N,M,L) -> lists:nth(M,lists:nth(N,L)).
 
+% Transform the given character
+charTransform(C)->
+    case C of
+        "o" -> " ";
+        X -> X
+    end.
 
 % Print the given map.
 printMap([]) -> nope;
 printMap([H|T]) -> 
-    io:fwrite("|~s|\n",[lists:foldl(fun(X,Acc) -> string:concat(string:concat(Acc," "),X) end, "", H)]), 
+    io:fwrite("|~s|\n",[lists:foldl(fun(X,Acc) -> string:concat(string:concat(Acc," "),charTransform(X)) end, "", H)]), 
     printMap(T).
 print([]) ->
     io:fwrite("EMPTY MAP\n");

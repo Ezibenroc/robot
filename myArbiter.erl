@@ -2,10 +2,10 @@
 -import(arbiter,[startArbiter/4]).
 -export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
-%-define(TIME_MOVE, 250).
-%-define(TIME_ENTER, 1000).
--define(TIME_MOVE, 5).
--define(TIME_ENTER, 10).
+-define(TIME_MOVE, 250).
+-define(TIME_ENTER, 1000).
+%-define(TIME_MOVE, 5).
+%-define(TIME_ENTER, 10).
 
 
 % HandleAction function for the arbiter.
@@ -33,7 +33,7 @@ handleAction(Pid, Params, State, _) ->
                     ->  timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,invalid,{X1,Y1},{X2,Y2}]}), State;
                 End =/= " "
                     -> timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,blocked,{X1,Y1},{X2,Y2}]}), State;
-                true -> timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,ok,{X1,Y1},{X2,Y2}]}), {Entry,Exit,myLists:set_(X2,Y2,"x",myLists:set_(X1,Y1,"x",Map))}
+                true -> timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,ok,{X1,Y1},{X2,Y2}]}), {Entry,Exit,myLists:set_(X2,Y2,"o",Map)}
             end;
         % HANDLEMOVE
         [handlemove,Action,{X1,Y1},{X2,Y2}] ->
@@ -56,7 +56,7 @@ handleAction(Pid, Params, State, _) ->
                 ->  timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,invalid,{Xentry,Yentry},RobotName]}), State;
             (EntryState =/= " ")
                 -> timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,blocked,{Xentry,Yentry},RobotName]}), State;
-            true -> timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,ok,{Xentry,Yentry},RobotName]}), {Entry,Exit,myLists:set_(Xentry,Yentry,"x",Map)}
+            true -> timer:send_after(?TIME_ENTER,self(),{arbiterRequest,Pid,action,[handleenter,ok,{Xentry,Yentry},RobotName]}), {Entry,Exit,myLists:set_(Xentry,Yentry,"o",Map)}
         end;
         % HANDLEENTER
         [handleenter,Action,{Xentry,Yentry},_] ->
@@ -80,4 +80,4 @@ handleInfo(PID,Params,State,_) ->
     end.
 
 start(State) ->
-    startArbiter(fun handleAction/4, fun handleInfo/4, State, true).
+    startArbiter(fun handleAction/4, fun handleInfo/4, State, false).
