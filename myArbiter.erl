@@ -2,10 +2,10 @@
 -import(arbiter,[startArbiter/4]).
 -export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
--define(TIME_MOVE, 250).
--define(TIME_ENTER, 1000).
-%-define(TIME_MOVE, 5).
-%-define(TIME_ENTER, 10).
+%-define(TIME_MOVE, 250).
+%-define(TIME_ENTER, 1000).
+-define(TIME_MOVE, 5).
+-define(TIME_ENTER, 10).
 
 
 % HandleAction function for the arbiter.
@@ -24,12 +24,11 @@ handleAction(Pid, Params, State, _) ->
             {{Start,_},{End,GoldEnd}} = try {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)} of
                     X -> X
                 catch
-                    error:function_clause ->  {{"r",0},{"blocked",0}}; % out of the map, so the robot is blocked
+                    error:function_clause ->  {{"r",0},{"x",0}}; % out of the map, so the robot is blocked
                     X -> X
                 end,
             if
-                (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1)
-                    or (Start =/= "r")
+                (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r")
                     ->  timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,invalid,{X1,Y1},{X2,Y2}]}), State;
                 End =/= " "
                     -> timer:send_after(?TIME_MOVE,self(),{arbiterRequest,Pid,action,[handlemove,blocked,{X1,Y1},{X2,Y2}]}), State;
@@ -71,13 +70,38 @@ handleAction(Pid, Params, State, _) ->
     end.
 
 handleInfo(PID,Params,State,_) ->
-    {Entry,_,_} = case State of
+    {Entry,Exit,Map} = case State of
         {Entry_,Exit_,Map_} -> {Entry_,Exit_,Map_};
         Err -> io:fwrite("HandleActions: received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
         [debug] -> PID ! State, State;
-        [entry] -> PID ! {entries,Entry}
+        [entry] -> PID ! {entries,Entry};
+        [analyze,{X1,Y1},{X2,Y2}] ->
+            {{Start,_},{End,GoldEnd}} = try {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)} of
+                    X -> X
+                catch
+                    error:function_clause ->  {{"r",0},{"x",0}}; % out of the map, so the robot is blocked
+                    X -> X
+                end,
+            if
+                (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r")
+                    ->  PID ! invalid ;
+                End =:= "x"
+                    -> PID ! {blocked,nomessage} ;
+                End =:= "r"
+                    -> PID ! {robotname,nomessage} ;
+                true -> 
+                    if
+                        GoldEnd > 0 -> PID ! {gold,nomessage} ;
+                        true ->
+                            IsEntry = lists:any((fun(X) -> X=:={X2,Y2} end),Exit),
+                            if
+                                IsEntry -> PID ! {exit,nomessage};
+                                true -> PID ! {empty,nomessage}
+                            end
+                    end
+            end
     end.
 
 start(State) ->
