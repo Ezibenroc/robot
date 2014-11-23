@@ -4,6 +4,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(TIME_REC, 50).
+-define(STUDENT,tom).
 
 % Memory format: {X,Y},TerminationRequester
 %    {X,Y} is the position
@@ -19,6 +20,7 @@ mainRobot(State,{X,Y},TerminationRequester,ID) ->
         ok -> handleOk(State,{X,Y},TerminationRequester,ID);
         invalid -> handleInvalid(State,{X,Y},TerminationRequester,ID);
         blocked -> handleBlocked(State,{X,Y},TerminationRequester,ID);
+        {Content,Message} -> handleInfo(State,{X,Y},TerminationRequester,ID,Content,Message);
         X -> io:fwrite("Robot ~w received unknown message: ~w\n",[ID,X])
     after ?TIME_REC ->
         case State of
@@ -55,6 +57,9 @@ handleOk(State,{X,Y},TerminationRequester,ID) ->
         {arbiterRequest,move,Pos} ->
 %            ?debugMsg("MOVE"),
             mainRobot(normal,Pos,TerminationRequester,ID);
+        {arbiterRequest,collect,_} ->
+%            ?debugMsg("COLLECT"),
+            mainRobot(normal,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
@@ -65,6 +70,12 @@ handleInvalid(State,{X,Y},TerminationRequester,ID) ->
             mainRobot(init,{X,Y},TerminationRequester,ID);
         {arbiterRequest,move,_} ->
             ?debugMsg("Received invalid in state move."),
+            mainRobot(normal,{X,Y},TerminationRequester,ID);
+        {arbiterRequest,collect,_} ->
+            ?debugMsg("Received invalid in state collect."),
+            mainRobot(normal,{X,Y},TerminationRequester,ID);
+        {arbiterRequest,analyze,_} ->
+            ?debugMsg("Received invalid in state analyze."),
             mainRobot(normal,{X,Y},TerminationRequester,ID);
         _ -> ?debugMsg("Received invalid in unknown state."),
             mainRobot(State,{X,Y},TerminationRequester,ID)
@@ -82,5 +93,18 @@ handleBlocked(State,{X,Y},TerminationRequester,ID) ->
 
 randomWalk(_,{X,Y},TerminationRequester,ID) ->
     NewPos={X+trunc(random:uniform()*3)-1,Y+trunc(random:uniform()*3)-1},
-    arbiter ! {arbiterRequest,self(),action,[move,{X,Y},NewPos]},
-    mainRobot({arbiterRequest,move,NewPos},{X,Y},TerminationRequester,ID).
+    arbiter ! {arbiterRequest,self(),info,[analyze,{X,Y},NewPos]},
+    mainRobot({arbiterRequest,analyze,NewPos},{X,Y},TerminationRequester,ID).
+
+handleInfo(State,{X,Y},TerminationRequester,ID,Content,_) ->
+    case State of
+        {arbiterRequest,analyze,Pos} ->
+                case Content of
+                    gold -> arbiter ! {arbiterRequest,self(),action,[collect,{X,Y},Pos,?STUDENT]},
+                        mainRobot({arbiterRequest,collect,Pos},{X,Y},TerminationRequester,ID);
+                    empty -> arbiter ! {arbiterRequest,self(),action,[move,{X,Y},Pos]},
+                        mainRobot({arbiterRequest,move,Pos},{X,Y},TerminationRequester,ID);
+                    _ -> mainRobot(normal,{X,Y},TerminationRequester,ID)
+                end;
+        _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
+    end.

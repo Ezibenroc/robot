@@ -91,7 +91,7 @@ handleAction(Pid, Params, State, _) ->
                 ok -> Pid ! ok, {_,GoldEntry} = myLists:get_(Xentry,Yentry,Map), {Entry,Exit,myLists:set_(Xentry,Yentry,{"r",GoldEntry},Map)}
             end;
         % MISC
-        _ -> ?debugMsg("HandleAction received unknown Params."), State
+        _ -> ?debugFmt("HandleAction received unknown Params: ~w.",[Params]), State
     end.
 
 handleInfo(PID,Params,State,_) ->
@@ -111,7 +111,7 @@ handleInfo(PID,Params,State,_) ->
                 end,
             if
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r")
-                    ->  PID ! invalid ;
+                    ->  PID ! invalid, ?debugFmt("Arbiter: invalid analyze (from ~w to ~w, with Start=~s.",[{X1,Y1},{X2,Y2},Start]) ;
                 End =:= "x"
                     -> PID ! {blocked,nomessage} ;
                 End =:= "r"
