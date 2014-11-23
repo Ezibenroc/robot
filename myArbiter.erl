@@ -41,7 +41,7 @@ handleAction(Pid, Params, State, _) ->
                 invalid -> Pid ! invalid, State ;
                 blocked -> Pid ! blocked, State ;
                 ok -> Pid ! ok, {{_,GoldStart},{_,GoldEnd}} = {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)},
-                    {Entry,Exit,myLists:set_(X2,Y2,{"r",GoldStart},myLists:set_(X1,Y1,{" ",GoldEnd},Map))}
+                    {Entry,Exit,myLists:set_(X2,Y2,{"r",GoldEnd},myLists:set_(X1,Y1,{" ",GoldStart},Map))}
             end;
         % ENTER
         [enter,EntryPoint,RobotName] ->
