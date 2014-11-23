@@ -1,6 +1,6 @@
 all : arbiter.beam  factory.beam  myArbiter.beam myArbiter_tests.beam\
 myLists.beam  myLists_tests.beam robotFunctions.beam robotUtils.beam  test.beam\
-myRobot.beam myRobot_tests.beam\
+myRobot.beam myRobot_tests.beam main.beam\
 allTests.beam
 
 %.beam : %.erl
@@ -8,6 +8,9 @@ allTests.beam
 
 test:
 	erl -run allTests test
+
+start:
+	erl -run main start
 
 clean : 
 	rm -f *.beam *.dump *~

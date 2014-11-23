@@ -32,8 +32,8 @@ move_test_() ->
     ?_assertEqual(blocked, X3),
     ?_assertEqual(invalid, X4),
     ?_assertEqual(ok, X5),
-    ?_assertEqual(" ", myLists:get_(1,1,element(3,S1))),
-    ?_assertEqual("r", myLists:get_(1,2,element(3,S1)))].
+    ?_assertEqual({" ",0}, myLists:get_(1,1,element(3,S1))),
+    ?_assertEqual({"r",0}, myLists:get_(1,2,element(3,S1)))].
 
 enter_test_() ->
     myArbiter:start(myLists:getState1()),
@@ -48,4 +48,4 @@ enter_test_() ->
     [?_assertEqual(invalid, X1),
     ?_assertEqual(ok, X2),
     ?_assertEqual(blocked, X3),
-    ?_assertEqual("r", myLists:get_(3,3,element(3,S1)))].
+    ?_assertEqual({"r",0}, myLists:get_(3,3,element(3,S1)))].
