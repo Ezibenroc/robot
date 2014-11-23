@@ -2,10 +2,10 @@
 -import(arbiter,[startArbiter/4]).
 -export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
-%-define(TIME_MOVE, 250).
-%-define(TIME_ENTER, 1000).
--define(TIME_MOVE, 5).
--define(TIME_ENTER, 10).
+-define(TIME_MOVE, 250).
+-define(TIME_ENTER, 1000).
+%-define(TIME_MOVE, 5).
+%-define(TIME_ENTER, 10).
 
 
 % HandleAction function for the arbiter.
