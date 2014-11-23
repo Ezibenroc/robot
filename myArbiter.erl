@@ -3,9 +3,11 @@
 -export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
 %-define(TIME_MOVE, 250).
+%-define(TIME_COLLECT, 500).
 %-define(TIME_ENTER, 1000).
--define(TIME_MOVE, 5).
--define(TIME_ENTER, 10).
+-define(TIME_MOVE, 1).
+-define(TIME_COLLECT, 2).
+-define(TIME_ENTER, 4).
 
 
 % HandleAction function for the arbiter.
@@ -19,7 +21,7 @@ handleAction(Pid, Params, State, _) ->
     end,
     case Params of
         % MOVE
-        % Delay of 250ms for a move
+        % Delay of 250ms
         [move,{X1,Y1},{X2,Y2}] ->
             {{Start,_},{End,GoldEnd}} = try {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)} of
                     X -> X
@@ -42,7 +44,30 @@ handleAction(Pid, Params, State, _) ->
                 ok -> Pid ! ok, {{_,GoldStart},{_,GoldEnd}} = {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)},
                     {Entry,Exit,myLists:set_(X2,Y2,{"r",GoldEnd},myLists:set_(X1,Y1,{" ",GoldStart},Map))}
             end;
+        % COLLECT
+        % Delay of 500ms
+        [collect,{X1,Y1},{X2,Y2},Student] ->
+            {{Start,_},{End,GoldEnd}} = try {myLists:get_(X1,Y1,Map),myLists:get_(X2,Y2,Map)} of
+                    X -> X
+                catch
+                    error:function_clause ->  {{"r",0},{"x",0}}; % out of the map, so the robot is blocked
+                    X -> X
+                end,
+            if
+                (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r") or (End =/= " ") or (GoldEnd =:= 0)
+                    ->  timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,invalid,{X1,Y1},{X2,Y2},Student]}), State;
+                true -> ?debugFmt("A robot just scored ~w for student ~w.",[GoldEnd,Student]),
+%                    superarbiter ! {score, Student, GoldEnd, self()},
+                    timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)}
+            end;
+        % HANDLECOLLECT
+        [handlecollect,Action,{_,_},{_,_},_] ->
+            case Action of
+                invalid -> Pid ! invalid, State ;
+                ok -> Pid ! ok, State
+            end;
         % ENTER
+        % Delay of 1000ms
         [enter,EntryPoint,RobotName] ->
         {Xentry,Yentry,{EntryState,GoldEntry}} = try lists:nth(EntryPoint,Entry) of
                 {X,Y} -> {X,Y,myLists:get_(X,Y,Map)};
@@ -66,7 +91,7 @@ handleAction(Pid, Params, State, _) ->
                 ok -> Pid ! ok, {_,GoldEntry} = myLists:get_(Xentry,Yentry,Map), {Entry,Exit,myLists:set_(Xentry,Yentry,{"r",GoldEntry},Map)}
             end;
         % MISC
-        Err2 -> io:fwrite("HandleActions: received unknown Params: ~w.\n",[Err2]), State
+        _ -> ?debugMsg("HandleAction received unknown Params."), State
     end.
 
 handleInfo(PID,Params,State,_) ->
