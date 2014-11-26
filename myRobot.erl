@@ -1,6 +1,6 @@
 -module(myRobot).
 -import(robotUtils,[multiSend/2]).
--export([noMessage/4,mainRobot/4]).
+-export([noMessage/4,mainRobot/4,exploreCell/2]).
 -include_lib("eunit/include/eunit.hrl").
 
 -define(TIME_REC, 50).
@@ -107,4 +107,20 @@ handleInfo(State,{X,Y},TerminationRequester,ID,Content,_) ->
                     _ -> mainRobot(normal,{X,Y},TerminationRequester,ID)
                 end;
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
+    end.
+
+% Explore the cell NewPos, assuming that the robot is located in Pos.
+exploreCell(Pos,NewPos) ->
+    arbiter ! {arbiterRequest,self(),info,[analyze,Pos,NewPos]},
+    receive
+        {empty,_} -> true;
+        {gold,_} ->
+            arbiter ! {arbiterRequest,self(),action,[collect,Pos,NewPos,?STUDENT]},
+            receive
+                ok -> true;
+                invalid -> ?debugMsg("Error in exploreCell.")
+            end;
+        {blocked,_} -> false;
+        {robotname,_} -> false;
+        {exit,_} -> false
     end.
