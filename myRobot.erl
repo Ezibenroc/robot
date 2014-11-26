@@ -1,6 +1,6 @@
 -module(myRobot).
 -import(robotUtils,[multiSend/2]).
--export([noMessage/4,mainRobot/4,exploreCell/2]).
+-export([noMessage/4,mainRobot/4,exploreCell/2,explore/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 -define(TIME_REC, 50).
@@ -34,7 +34,7 @@ noMessage(State,{X,Y},TerminationRequester,ID) ->
     case State of
         init -> arbiter ! {arbiterRequest,self(),info,[entry]}, % ask the coordinates of the entry
             mainRobot(State,{X,Y},TerminationRequester,ID) ;
-        normal -> randomWalk(State,{X,Y},TerminationRequester,ID);
+        normal -> exploreAndMove(State,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
@@ -110,6 +110,8 @@ handleInfo(State,{X,Y},TerminationRequester,ID,Content,_) ->
     end.
 
 % Explore the cell NewPos, assuming that the robot is located in Pos.
+% If gold is found, then collect it.
+% Return true if and only if a move to the destination is possible.
 exploreCell(Pos,NewPos) ->
     arbiter ! {arbiterRequest,self(),info,[analyze,Pos,NewPos]},
     receive
@@ -123,4 +125,40 @@ exploreCell(Pos,NewPos) ->
         {blocked,_} -> false;
         {robotname,_} -> false;
         {exit,_} -> false
+    end.
+
+% Explore the given cell.
+% If we can perform a move, return the singleton list [NewPos], otherwise return [].
+exploreCellToList(Pos,NewPos) ->
+    Move = exploreCell(Pos,NewPos),
+    if
+        Move -> [NewPos];
+        true -> []
+    end.
+
+% Explore all the neighbours of the cell {X,Y}.
+% Return the list of cells to which we can move.
+explore({X,Y}) ->
+    lists:append([
+        exploreCellToList({X,Y},{X+1,Y}),
+        exploreCellToList({X,Y},{X-1,Y}),
+        exploreCellToList({X,Y},{X,Y+1}),
+        exploreCellToList({X,Y},{X,Y-1}),
+        exploreCellToList({X,Y},{X+1,Y+1}),
+        exploreCellToList({X,Y},{X+1,Y-1}),
+        exploreCellToList({X,Y},{X-1,Y+1}),
+        exploreCellToList({X,Y},{X-1,Y-1})
+        ]).
+
+% Explore all the neighbours of the cell {X,Y}.
+% Move randomly toward one empty cell.
+exploreAndMove(State,{X,Y},TerminationRequester,ID) ->
+    ListPos = explore({X,Y}),
+    case ListPos of
+        [] -> mainRobot(State,{X,Y},TerminationRequester,ID);
+        _ -> 
+            Next=trunc(random:uniform()*length(ListPos))+1,
+            NextPos = lists:nth(Next,ListPos),
+            arbiter ! {arbiterRequest,self(),action,[move,{X,Y},NextPos]},
+            mainRobot({arbiterRequest,move,NextPos},{X,Y},TerminationRequester,ID)
     end.

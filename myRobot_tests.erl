@@ -42,3 +42,8 @@ exploreCell_test_() ->
     ?_assert(Empty),
     ?_assert(Gold),
     ?_assertNot(Exit)].
+
+explore_test_() ->
+    myArbiter:start(myLists:getState1()),
+    ListPos = myRobot:explore({1,4}),
+    [?_assertEqual(ListPos,[{1,5},{2,5}])].
