@@ -100,7 +100,7 @@ collect_test_() ->
     receive Block -> Block end,
     arbiter ! {arbiterRequest,self(),action,[collect,{1,4},{1,5},foo]},
     receive Empty -> Empty end,
-    arbiter ! {arbiterRequest,self(),action,[collect,{1,4},{8,9},foo]},
+    arbiter ! {arbiterRequest,self(),action,[collect,{1,4},{8,9},foo]}, %%%
     receive TooFar -> TooFar end,
     arbiter ! {arbiterRequest,self(),action,[collect,{9,9},{8,9},foo]},
     receive Gold -> Gold end,

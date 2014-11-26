@@ -6,19 +6,6 @@
 -define(TIME_REC, 50).
 -define(STUDENT,tom).
 
-nextCell({X,Y},Ori) ->
-    case Ori of
-        northeast ->    {{X+1,Y},north};
-        north ->        {{X+1,Y-1},northwest};
-        northwest ->    {{X,Y-1},west};
-        west ->         {{X-1,Y-1},southwest};
-        southwest ->    {{X-1,Y},south};
-        south ->        {{X-1,Y+1},southeast};
-        southeast ->    {{X,Y+1},east};
-        east ->         {{X,Y},finish};
-        _ ->            {{X+1,Y+1},northeast}
-    end.
-
 % Memory format: {X,Y},TerminationRequester
 %    {X,Y} is the position
 
@@ -47,7 +34,7 @@ noMessage(State,{X,Y},TerminationRequester,ID) ->
     case State of
         init -> arbiter ! {arbiterRequest,self(),info,[entry]}, % ask the coordinates of the entry
             mainRobot(State,{X,Y},TerminationRequester,ID) ;
-        normal -> searchGold({normal,[]},{X,Y},TerminationRequester,ID);
+        normal -> randomWalk(State,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
@@ -67,12 +54,12 @@ handleOk(State,{X,Y},TerminationRequester,ID) ->
             Pos = lists:nth(Entry,ListEntries),
 %            ?debugMsg("ENTER"),
             mainRobot(normal,Pos,TerminationRequester,ID);
-        {arbiterRequest,move,Pos,_} ->
+        {arbiterRequest,move,Pos} ->
 %            ?debugMsg("MOVE"),
             mainRobot(normal,Pos,TerminationRequester,ID);
-        {arbiterRequest,collect,_,Ori,EmptyCells} ->
+        {arbiterRequest,collect,_} ->
 %            ?debugMsg("COLLECT"),
-            searchGold({Ori,EmptyCells},{X,Y},TerminationRequester,ID);
+            mainRobot(normal,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
@@ -81,13 +68,13 @@ handleInvalid(State,{X,Y},TerminationRequester,ID) ->
         {arbiterRequest,enter,_,_} ->
             ?debugMsg("Received invalid in state enter."),
             mainRobot(init,{X,Y},TerminationRequester,ID);
-        {arbiterRequest,move,_,_} ->
+        {arbiterRequest,move,_} ->
             ?debugMsg("Received invalid in state move."),
             mainRobot(normal,{X,Y},TerminationRequester,ID);
-        {arbiterRequest,collect,_,_} ->
+        {arbiterRequest,collect,_} ->
             ?debugMsg("Received invalid in state collect."),
             mainRobot(normal,{X,Y},TerminationRequester,ID);
-        {arbiterRequest,analyze,_,_,_} ->
+        {arbiterRequest,analyze,_} ->
             ?debugMsg("Received invalid in state analyze."),
             mainRobot(normal,{X,Y},TerminationRequester,ID);
         _ -> ?debugMsg("Received invalid in unknown state."),
@@ -99,7 +86,7 @@ handleBlocked(State,{X,Y},TerminationRequester,ID) ->
         {arbiterRequest,enter,Entry,_} -> 
             arbiter ! {arbiterRequest,self(),action,[enter,Entry,ID]},
             mainRobot(State,{X,Y},TerminationRequester,ID);
-        {arbiterRequest,move,_,_} ->
+        {arbiterRequest,move,_} ->
             mainRobot(normal,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
@@ -107,37 +94,17 @@ handleBlocked(State,{X,Y},TerminationRequester,ID) ->
 randomWalk(_,{X,Y},TerminationRequester,ID) ->
     NewPos={X+trunc(random:uniform()*3)-1,Y+trunc(random:uniform()*3)-1},
     arbiter ! {arbiterRequest,self(),info,[analyze,{X,Y},NewPos]},
-    mainRobot({arbiterRequest,analyze,NewPos,unknown},{X,Y},TerminationRequester,ID).
-
-searchGold({Ori,EmptyCells},{X,Y},TerminationRequester,ID) ->
-    case Ori of
-        finish -> 
-%        ?debugFmt("Emptycells= ~w",[EmptyCells]),
-            case EmptyCells of
-                [] -> mainRobot(normal,{X,Y},TerminationRequester,ID);
-                _ ->
-                    Next=trunc(random:uniform()*length(EmptyCells))+1,
-                    NextPos = lists:nth(Next,EmptyCells),
-                    arbiter ! {arbiterRequest,self(),action,[move,{X,Y},NextPos]},
-                    mainRobot({arbiterRequest,move,NextPos},{X,Y},TerminationRequester,ID)
-                end;
-        _ ->
-%            ?debugFmt("Emptycells= ~w",[EmptyCells]),
-            {NewPos,NewOri} = nextCell({X,Y},Ori),
-            arbiter ! {arbiterRequest,self(),info,[analyze,{X,Y},NewPos]},
-            mainRobot({arbiterRequest,analyze,NewPos,NewOri,EmptyCells},{X,Y},TerminationRequester,ID)
-    end.
+    mainRobot({arbiterRequest,analyze,NewPos},{X,Y},TerminationRequester,ID).
 
 handleInfo(State,{X,Y},TerminationRequester,ID,Content,_) ->
     case State of
-        {arbiterRequest,analyze,Pos,Ori,EmptyCells} ->
-            case Content of
-                gold -> arbiter ! {arbiterRequest,self(),action,[collect,{X,Y},Pos,?STUDENT]},
-                    mainRobot({arbiterRequest,collect,Pos,Ori,[Pos|EmptyCells]},{X,Y},TerminationRequester,ID);
-                empty ->
-                    searchGold({Ori,[Pos|EmptyCells]},{X,Y},TerminationRequester,ID);
-                _ -> 
-                    searchGold({Ori,EmptyCells},{X,Y},TerminationRequester,ID)
-            end;
+        {arbiterRequest,analyze,Pos} ->
+                case Content of
+                    gold -> arbiter ! {arbiterRequest,self(),action,[collect,{X,Y},Pos,?STUDENT]},
+                        mainRobot({arbiterRequest,collect,Pos},{X,Y},TerminationRequester,ID);
+                    empty -> arbiter ! {arbiterRequest,self(),action,[move,{X,Y},Pos]},
+                        mainRobot({arbiterRequest,move,Pos},{X,Y},TerminationRequester,ID);
+                    _ -> mainRobot(normal,{X,Y},TerminationRequester,ID)
+                end;
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
