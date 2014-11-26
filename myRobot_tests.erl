@@ -23,3 +23,27 @@ termination_test_() ->
     [?_assertNot(ListRobot2=:=[]),
     ?_assertEqual(ListRobot3,[]),
     ?_assertEqual(ListLength,NbTerminate)].
+
+exploreCell_test_() ->
+    myArbiter:start(myLists:getState1()),
+    OutMap1 = myRobot:exploreCell({1,1},{0,1}),
+    OutMap2 = myRobot:exploreCell({1,1},{1,0}),
+    OutMap3 = myRobot:exploreCell({9,9},{10,9}),
+    OutMap4 = myRobot:exploreCell({9,9},{9,10}),
+    Block = myRobot:exploreCell({1,4},{2,4}),
+    Empty = myRobot:exploreCell({1,4},{1,5}),
+    Gold = myRobot:exploreCell({9,9},{8,9}),
+    Exit = myRobot:exploreCell({6,2},{6,3}),
+    [?_assertNot(OutMap1),
+    ?_assertNot(OutMap2),
+    ?_assertNot(OutMap3),
+    ?_assertNot(OutMap4),
+    ?_assertNot(Block),
+    ?_assert(Empty),
+    ?_assert(Gold),
+    ?_assertNot(Exit)].
+
+explore_test_() ->
+    myArbiter:start(myLists:getState1()),
+    ListPos = myRobot:explore({1,4}),
+    [?_assertEqual(ListPos,[{1,5},{2,5}])].
