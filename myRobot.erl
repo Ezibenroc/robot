@@ -91,11 +91,6 @@ handleBlocked(State,{X,Y},TerminationRequester,ID) ->
         _ -> mainRobot(State,{X,Y},TerminationRequester,ID)
     end.
 
-randomWalk(_,{X,Y},TerminationRequester,ID) ->
-    NewPos={X+trunc(random:uniform()*3)-1,Y+trunc(random:uniform()*3)-1},
-    arbiter ! {arbiterRequest,self(),info,[analyze,{X,Y},NewPos]},
-    mainRobot({arbiterRequest,analyze,NewPos},{X,Y},TerminationRequester,ID).
-
 handleInfo(State,{X,Y},TerminationRequester,ID,Content,_) ->
     case State of
         {arbiterRequest,analyze,Pos} ->
