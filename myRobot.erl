@@ -15,7 +15,6 @@ spawnFactory() ->
 % Function called to start a robot.
 mainRobot(State,History,{X,Y},TerminationRequester,ID) ->
 %    ?debugVal(State),
-    ?debugVal(History),
     receive
         {history,ListPositions} -> mainRobot(State,myLists:union(History,ListPositions),{X,Y},TerminationRequester,ID);
         {PID,terminate_request} -> mainRobot(terminate,History,{X,Y},[PID|TerminationRequester],ID);
