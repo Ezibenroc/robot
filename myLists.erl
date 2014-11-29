@@ -1,6 +1,6 @@
 -module(myLists).
 -include_lib("eunit/include/eunit.hrl").
--export([set_/4,get_/3,print/1,getMap1/0,getState1/0,getState2/0,getEntryPoints/0,getExitPoints/0,getState3/0,getState4/0]).
+-export([set_/4,get_/3,difference/2,print/1,getMap1/0,getState1/0,getState2/0,getEntryPoints/0,getExitPoints/0,getState3/0,getState4/0]).
 
 % set_ the N-th cell of the list to X
 % Index begin by 1
@@ -15,6 +15,10 @@ set_(N,M,X,[H|T]) -> [H|set_(N-1,M,X,T)].
 
 % Get the cell (N,M) of the given map.
 get_(N,M,L) -> lists:nth(M,lists:nth(N,L)).
+
+% Difference of lists. Returns elements of L1 which are not in L2.
+difference(L1,L2) ->
+    lists:filter(fun (X) -> lists:all(fun (Y) -> X=/=Y end, L2) end, L1).
 
 % Transform the given character
 charTransform(C)->
