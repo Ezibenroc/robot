@@ -10,7 +10,7 @@ terminateAck_receive() ->
 % For instance, if one want to spawn X robots in a test, there might be 2X or 3X robots...
 termination_test_() ->
     myArbiter:start(myLists:getState2()),
-    factory:spawnFactory(myRobot, mainRobot, [init,[],{-1,-1},[]]),
+    myRobot:spawnFactory(),
     factory ! {spawn,10,self()},
     ?debugVal(self()),
     receive {spawned, ListRobot} -> ListRobot end,

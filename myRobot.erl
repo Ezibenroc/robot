@@ -1,6 +1,6 @@
 -module(myRobot).
 -import(robotUtils,[multiSend/2]).
--export([mainRobot/5,exploreCell/2,explore/1]).
+-export([spawnFactory/0,mainRobot/5,exploreCell/2,explore/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 -define(TIME_REC, 50).
@@ -9,7 +9,8 @@
 % Memory format: {X,Y},TerminationRequester
 %    {X,Y} is the position
 
-% When one robot receive {terminate_request}, he handle all its last messages, then send an ack and quit.
+spawnFactory() ->
+    factory:spawnFactory(myRobot, mainRobot, [init,[],{-1,-1},[]]).
 
 % Function called to start a robot.
 mainRobot(State,History,{X,Y},TerminationRequester,ID) ->
