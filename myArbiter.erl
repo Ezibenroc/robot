@@ -17,7 +17,7 @@
 handleAction(Pid, Params, State, _) ->
     {Entry,Exit,Map} = case State of
         {Entry_,Exit_,Map_} -> {Entry_,Exit_,Map_};
-        Err -> io:fwrite("HandleActions: received wrong formated State: ~w.\n",[Err]), State
+        Err -> io:fwrite(standard_error,"Arboter: HandleActions received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
         % MOVE
@@ -56,7 +56,7 @@ handleAction(Pid, Params, State, _) ->
             if
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r") or (End =/= " ") or (GoldEnd =:= 0)
                     ->  timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,invalid,{X1,Y1},{X2,Y2},Student]}), State;
-                true -> ?debugFmt("A robot just scored ~w for student ~w.",[GoldEnd,Student]),
+                true -> io:fwrite(standard_error,"Arbiter: A robot just scored ~w for student ~w.\n",[GoldEnd,Student]),
 %                    superarbiter ! {score, Student, GoldEnd, self()},
                     timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)}
             end;
@@ -91,13 +91,13 @@ handleAction(Pid, Params, State, _) ->
                 ok -> Pid ! ok, {_,GoldEntry} = myLists:get_(Xentry,Yentry,Map), {Entry,Exit,myLists:set_(Xentry,Yentry,{"r",GoldEntry},Map)}
             end;
         % MISC
-        _ -> ?debugFmt("HandleAction received unknown Params: ~w.",[Params]), State
+        _ -> io:fwrite(standard_error,"Arbiter: HandleAction received unknown Params: ~w.\n",[Params]), State
     end.
 
 handleInfo(PID,Params,State,_) ->
     {Entry,Exit,Map} = case State of
         {Entry_,Exit_,Map_} -> {Entry_,Exit_,Map_};
-        Err -> io:fwrite("HandleActions: received wrong formated State: ~w.\n",[Err]), State
+        Err -> io:fwrite(standard_error,"Arbiter: HandleActions received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
         [debug] -> PID ! State, State;
@@ -111,7 +111,7 @@ handleInfo(PID,Params,State,_) ->
                 end,
             if
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r")
-                    ->  PID ! invalid, ?debugFmt("Arbiter: invalid analyze (from ~w to ~w, with Start=~s.",[{X1,Y1},{X2,Y2},Start]) ;
+                    ->  PID ! invalid ;
                 End =:= "x"
                     -> PID ! {blocked,nomessage} ;
                 End =:= "r"

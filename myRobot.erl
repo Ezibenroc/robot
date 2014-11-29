@@ -23,7 +23,7 @@ mainRobot(State,History,{X,Y},TerminationRequester,ID) ->
         invalid -> handleInvalid(State,History,{X,Y},TerminationRequester,ID);
         blocked -> handleBlocked(State,History,{X,Y},TerminationRequester,ID);
         {Content,Message} -> handleInfo(State,History,{X,Y},TerminationRequester,ID,Content,Message);
-        X -> io:fwrite("Robot ~w received unknown message: ~w\n",[ID,X])
+        X -> io:fwrite(standard_error,"Robot ~w: Received unknown message: ~w\n",[ID,X])
     after ?TIME_REC ->
         case State of
             terminate -> robotUtils:multiSend(TerminationRequester,{self(),ackTerminate}), terminated;
@@ -54,15 +54,12 @@ handleOk(State,History,{X,Y},TerminationRequester,ID) ->
     case State of
         {arbiterRequest,enter,Entry,ListEntries} -> 
             Pos = lists:nth(Entry,ListEntries),
-%            ?debugMsg("ENTER"),
             robotUtils:broadcast({history,[Pos]}),
             mainRobot(normal,[Pos|History],Pos,TerminationRequester,ID);
         {arbiterRequest,move,Pos} ->
-%            ?debugMsg("MOVE"),
             robotUtils:broadcast({history,[Pos]}),
             mainRobot(normal,[Pos|History],Pos,TerminationRequester,ID);
         {arbiterRequest,collect,_} ->
-%            ?debugMsg("COLLECT"),
             mainRobot(normal,History,{X,Y},TerminationRequester,ID);
         _ -> mainRobot(State,History,{X,Y},TerminationRequester,ID)
     end.
@@ -70,18 +67,18 @@ handleOk(State,History,{X,Y},TerminationRequester,ID) ->
 handleInvalid(State,History,{X,Y},TerminationRequester,ID) ->
     case State of
         {arbiterRequest,enter,_,_} ->
-            ?debugMsg("Received invalid in state enter."),
+            io:fwrite(standard_error,"Robot ~w: Received invalid in state enter.\n",[ID]),
             mainRobot(init,History,{X,Y},TerminationRequester,ID);
         {arbiterRequest,move,_} ->
-            ?debugMsg("Received invalid in state move."),
+            io:fwrite(standard_error,"Robot ~w: Received invalid in state move.\n",[ID]),
             mainRobot(normal,History,{X,Y},TerminationRequester,ID);
         {arbiterRequest,collect,_} ->
-            ?debugMsg("Received invalid in state collect."),
+            io:fwrite(standard_error,"Robot ~w: Received invalid in state collect.\n",[ID]),
             mainRobot(normal,History,{X,Y},TerminationRequester,ID);
         {arbiterRequest,analyze,_} ->
-            ?debugMsg("Received invalid in state analyze."),
+            io:fwrite(standard_error,"Robot ~w: Received invalid in state analyze.\n",[ID]),
             mainRobot(normal,History,{X,Y},TerminationRequester,ID);
-        _ -> ?debugMsg("Received invalid in unknown state."),
+        _ -> io:fwrite(standard_error,"Robot ~w: Received invalid in unknown state.\n",[ID]),
             mainRobot(State,History,{X,Y},TerminationRequester,ID)
     end.
 
@@ -118,8 +115,7 @@ exploreCell(Pos,NewPos) ->
         {gold,_} ->
             arbiter ! {arbiterRequest,self(),action,[collect,Pos,NewPos,?STUDENT]},
             receive
-                ok -> true;
-                invalid -> ?debugMsg("Error in exploreCell.")
+                ok -> true
             end;
         {blocked,_} -> false;
         {robotname,_} -> false;
