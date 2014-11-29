@@ -53,10 +53,10 @@ handleOk(State,History,{X,Y},TerminationRequester,ID) ->
         {arbiterRequest,enter,Entry,ListEntries} -> 
             Pos = lists:nth(Entry,ListEntries),
 %            ?debugMsg("ENTER"),
-            mainRobot(normal,History,Pos,TerminationRequester,ID);
+            mainRobot(normal,[Pos|History],Pos,TerminationRequester,ID);
         {arbiterRequest,move,Pos} ->
 %            ?debugMsg("MOVE"),
-            mainRobot(normal,History,Pos,TerminationRequester,ID);
+            mainRobot(normal,[Pos|History],Pos,TerminationRequester,ID);
         {arbiterRequest,collect,_} ->
 %            ?debugMsg("COLLECT"),
             mainRobot(normal,History,{X,Y},TerminationRequester,ID);
@@ -149,11 +149,23 @@ explore({X,Y}) ->
 % Move randomly toward one empty cell.
 exploreAndMove(State,History,{X,Y},TerminationRequester,ID) ->
     ListPos = explore({X,Y}),
-    case ListPos of
-        [] -> mainRobot(State,History,{X,Y},TerminationRequester,ID);
+    ListNewPos = myLists:difference(ListPos,History),
+    NextPos =
+        case ListPos of
+            [] -> none ;
+            _ ->
+                case ListNewPos of
+                    [] ->
+                        Next=trunc(random:uniform()*length(ListPos))+1,
+                        lists:nth(Next,ListPos);
+                    _ ->
+                        Next=trunc(random:uniform()*length(ListNewPos))+1,
+                        lists:nth(Next,ListNewPos)
+                end
+        end,
+    case NextPos of
+        none -> mainRobot(State,History,{X,Y},TerminationRequester,ID);
         _ -> 
-            Next=trunc(random:uniform()*length(ListPos))+1,
-            NextPos = lists:nth(Next,ListPos),
             arbiter ! {arbiterRequest,self(),action,[move,{X,Y},NextPos]},
             mainRobot({arbiterRequest,move,NextPos},History,{X,Y},TerminationRequester,ID)
     end.
