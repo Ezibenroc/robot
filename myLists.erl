@@ -72,7 +72,7 @@ getMap1() ->
     [{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{"r",0}]
     ].
 
-getEntryPoints() -> [{3,3},{8,2},{13,15}].
+getEntryPoints() -> [{3,3},{8,2}].
 getExitPoints() -> [{6,3}].
 
 getState1() ->
@@ -111,7 +111,7 @@ getMap3() ->
     [{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0},{" ",0}]
     ].
 getState3() ->
-    {getEntryPoints(),getExitPoints(),getMap3()}. % Entry points, Exit points, Map
+    {[{13,15}|getEntryPoints()],getExitPoints(),getMap3()}. % Entry points, Exit points, Map
 
 getMap4() ->
     [
