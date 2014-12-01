@@ -2,6 +2,7 @@
 -import(arbiter,[startArbiter/4]).
 -export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
+-define(UI_NODE, 'alice@abc.def').
 -define(TIME_MOVE, 250).
 -define(TIME_COLLECT, 500).
 -define(TIME_ENTER, 1000).
@@ -100,6 +101,7 @@ handleInfo(PID,Params,State,_) ->
         Err -> io:fwrite(standard_error,"Arbiter: HandleActions received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
+        [Name,robots] -> Names=foo, { Name, ?UI_NODE } ! Names, State;
         [debug] -> PID ! State, State;
         [entry] -> PID ! {entries,Entry};
         [analyze,{X1,Y1},{X2,Y2}] ->
