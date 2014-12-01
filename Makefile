@@ -7,7 +7,7 @@ allTests.beam
 	erl -compile $<
 
 test:
-	erl -run allTests test
+	erl -noshell -s allTests test -s init stop 2>/dev/null
 
 start:
 	erl -run main start

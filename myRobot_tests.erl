@@ -12,7 +12,6 @@ termination_test_() ->
     myArbiter:start(myLists:getState2()),
     myRobot:spawnFactory(),
     factory ! {spawn,10,self()},
-    ?debugVal(self()),
     receive {spawned, ListRobot} -> ListRobot end,
     ListRobot2 = robotUtils:allNames(),
     timer:sleep(1000),
