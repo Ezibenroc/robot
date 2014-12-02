@@ -28,7 +28,7 @@ Run the program:
 
     make standalone
 
-The terminal now display the evolution of the map.
+The terminal now displays the evolution of the map.
 
 Quit the program:
 
@@ -51,7 +51,7 @@ In a second terminal:
 
     make ui
 
-The first terminal now display the evolution of the map. The second terminal is an
+The first terminal now displays the evolution of the map. The second terminal is an
 Erlang shell offering some functions:
 
 * `ui:allNames()`   will display the name of all robots of the map.
