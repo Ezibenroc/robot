@@ -1,9 +1,12 @@
+% User interface.
+
 -module(ui).
 -export([start/0,allNames/0,listen_loop/1,printScore/0,terminate/0]).
 
 -define(ROBOT_NODE, 'bob@foo.bar').
 -define(COOKIE, 'asimov').
 
+% Connection with the main module at the start of the UI.
 flood() ->
     X=net_adm:ping(?ROBOT_NODE),
     case X of
@@ -11,9 +14,11 @@ flood() ->
         _ -> timer:sleep(100), flood()
     end.
 
+% Print a list.
 print(L) ->
     lists:map(fun(X) -> io:fwrite("\t~w\n",[X]) end, L).
 
+% Handle several messages, either from the UI or from the arbiter.
 listen(State) ->
     receive
         {robotList,L} -> io:fwrite("Robot list:\n"), print(L), State;
@@ -29,12 +34,15 @@ listen_loop(State) ->
     Y=listen(State),
     listen_loop(Y).
 
+% Display all the robots' names.
 allNames() ->
     { arbiter, ?ROBOT_NODE } ! {arbiterRequest,self(),info,[ui,robots]}.
 
+% Display all the students' scores.
 printScore() ->
     listener ! printscore.
 
+% Terminate properly the arbiter and the robots.
 terminate() ->
     { arbiter, ?ROBOT_NODE } ! {arbiterRequest,self(),exit,[]}.
 

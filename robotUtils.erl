@@ -1,3 +1,5 @@
+% Administrative functions for robots.
+
 -module(robotUtils).
 -export([allPids/0,allNames/0,killRobots/0,multiSend/2,broadcast/1]).
 

@@ -5,6 +5,7 @@
 -define(UI_NODE, 'alice@abc.def').
 -define(COOKIE, 'asimov').
 
+% Connection with the UI at the start of the module.
 flood() ->
     X=net_adm:ping(?UI_NODE),
     case X of
