@@ -70,7 +70,8 @@ then compile and run.
 
 ## Distributed algorithms
 
-We describe here the strategy used to efficiently find gold.
+We describe here the strategy used to efficiently find gold. Robots perform an action
+depending on their current state, and the (eventual) message they read.
 
 Each time a robot has no available message, it scans its neighbour cells by sending
 info queries to the arbiter. This is more efficient than walking/mining a cell without
