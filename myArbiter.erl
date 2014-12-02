@@ -2,6 +2,7 @@
 -import(arbiter,[startArbiter/4]).
 -export([handleAction/4,start/1]).
 -include_lib("eunit/include/eunit.hrl").
+-define(UI_NODE, 'alice@abc.def').
 -define(TIME_MOVE, 250).
 -define(TIME_COLLECT, 500).
 -define(TIME_ENTER, 1000).
@@ -57,6 +58,7 @@ handleAction(Pid, Params, State, _) ->
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r") or (End =/= " ") or (GoldEnd =:= 0)
                     ->  timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,invalid,{X1,Y1},{X2,Y2},Student]}), State;
                 true -> io:fwrite(standard_error,"Arbiter: A robot just scored ~w for student ~w.\n",[GoldEnd,Student]),
+                    { listener, ?UI_NODE } ! {someonescored,Student,GoldEnd},
 %                    superarbiter ! {score, Student, GoldEnd, self()},
                     timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)}
             end;
@@ -100,7 +102,7 @@ handleInfo(PID,Params,State,_) ->
         Err -> io:fwrite(standard_error,"Arbiter: HandleActions received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
-        [ui,robots,Node] -> io:fwrite(standard_error,"Received ui request: ~w.\n",[[ui,robots]]),{ listener, Node } ! {robotList,robotUtils:allNames()}, State;
+        [ui,robots] -> io:fwrite(standard_error,"Received ui request: ~w.\n",[[ui,robots]]),{ listener, ?UI_NODE } ! {robotList,robotUtils:allNames()}, State;
         [debug] -> PID ! State, State;
         [entry] -> PID ! {entries,Entry};
         [analyze,{X1,Y1},{X2,Y2}] ->

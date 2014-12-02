@@ -14,6 +14,7 @@ flood() ->
 listen() ->
     receive
         {robotList,L} -> io:fwrite("Robot list:\n~w\n",[L]);
+        {someonescored,Student,Score} -> io:fwrite("Student ~w scored ~w points.\n",[Student,Score]);
         X -> io:fwrite("Received unknown message: ~w\n",[X])
     end.
 
@@ -22,7 +23,7 @@ listen_loop() ->
     listen_loop().
 
 allNames() ->
-    { arbiter, ?ROBOT_NODE } ! {arbiterRequest,self(),info,[ui,robots,node()]}.
+    { arbiter, ?ROBOT_NODE } ! {arbiterRequest,self(),info,[ui,robots]}.
 
 % Function to start the UI
 start() ->
