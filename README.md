@@ -38,7 +38,7 @@ Some results (points scored, eventual runtime errors) are written in the file `m
 
 #### Interactive mode
 
-This mode offer a user interface, which allow to query information about the system
+This mode offers a user interface, which allow to query information about the system
 state, and to terminate properly the program.
 
 Run the program:
@@ -84,7 +84,7 @@ the robot move to a free neighbour cell, and start this process again.
 The fundamental decision is the choice of such a free cell to move on.
 The robot will chose randomly among the cells where no robot have never been. If
 no such cell exist, it will chose randomly among all the free cells. If there is
-no free cell at all, it stays in place.
+no free cell at all, it stays in place (and will restart the process in a few time).
 
 Once the robot chose a cell, it performs a move query to the arbiter, and informs
 the other robots of this new action. By doing so, all robots know in real-time what
