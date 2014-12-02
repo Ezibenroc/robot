@@ -35,6 +35,7 @@ arbiterLoop(HandleAction, HandleInfo, State, Debug) ->
     % processing the request
     case NewRequest of
         {exit,_} ->
+            io:fwrite(standard_error,"UI request:\t~w\n",[NewRequest]),
             ListRobot = robotUtils:allPids(),
             robotUtils:broadcast({self(),terminate_request}),
             timer:send_after(2000,self(),{arbiterRequest,self(),handleexit,ListRobot}),
@@ -42,7 +43,7 @@ arbiterLoop(HandleAction, HandleInfo, State, Debug) ->
         {handleexit,ListRobot} ->
             L = terminateAck(ListRobot),
             case L of
-                [] -> io:fwrite(standard_error,"Arbiter:\tall robots terminated, stop.",[]),
+                [] -> io:fwrite(standard_error,"Arbiter:\tall robots terminated, stop.\n",[]),
                     { listener, ?UI_NODE } ! terminationsuccess;
                 _ -> io:fwrite(standard_error,"Arbiter:\tthe following robots did not respond to termination request:\n",[]),
                     lists:map(fun(X) -> io:fwrite(standard_error,"\t~w\n",[X]) end, L),
