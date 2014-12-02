@@ -59,8 +59,13 @@ handleAction(Pid, Params, State, _) ->
                     ->  timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,invalid,{X1,Y1},{X2,Y2},Student]}), State;
                 true -> io:fwrite(standard_error,"Arbiter:\tstudent ~w scored ~w\n",[Student,GoldEnd]),
                     { listener, ?UI_NODE } ! {someonescored,Student,GoldEnd},
-                    superarbiter ! {score, Student, GoldEnd, self()},
-                    timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)}
+                    try superarbiter ! {score, Student, GoldEnd, self()} of
+                        _ -> timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)}
+                    catch
+                        error:badarg -> io:fwrite(standard_error,"Arbiter:\tfailed to send message to superarbiter.\n",[]),
+                            timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)};
+                        SomeError -> SomeError
+                    end
             end;
         % HANDLECOLLECT
         [handlecollect,Action,{_,_},{_,_},_] ->

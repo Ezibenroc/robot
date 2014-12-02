@@ -30,7 +30,8 @@ start() ->
         _ ->    erlang:set_cookie(node(),?COOKIE),
                 flood()
     end,
-    register(superarbiter,spawn(main,superarbiter_loop,[])),
+    % Uncomment to test the superarbiter I coded.
+%   register(superarbiter,spawn(main,superarbiter_loop,[])),
     myArbiter:start(myLists:getState3()),
     myRobot:spawnFactory(),
     factory ! {spawn,10,self()}.
