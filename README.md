@@ -59,3 +59,10 @@ erlang shell offering some functions:
 * `ui:terminate()`  will terminate properly the program.
 
 Some results (points scored, queries from the UI, eventual runtime errors) are writen in the file `main.log`.
+
+#### Superarbiter
+
+The program is intended to run with some provided superabiter. It should work, but
+has not been tested. However, one can run the program with some dummy superarbiter:
+in the file `main.erl`, uncomment the line `register(superarbiter,spawn(main,superarbiter_loop,[])),`,
+then compile and run.
