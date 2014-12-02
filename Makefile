@@ -9,21 +9,14 @@ allTests.beam
 test:
 	erl -noshell -s allTests test -s init stop 2>/dev/null
 
-start_simulation:
+standalone:
 	erl -run main start 2> main.log
 
-start_simulation_ui:
+interactive:
 	erl -setcookie asimov -name bob@foo.bar -run main start 2> main.log
 
-start_ui:
+ui:
 	erl -setcookie asimov -name alice@abc.def -run ui start
-
-help:
-	@echo "make"
-	@echo "make start_simulation"
-	@echo "make start_simulation_ui"
-	@echo "make start_ui"
-	@echo "make test"
 
 clean : 
 	rm -f *.beam *.dump *~ *.log
