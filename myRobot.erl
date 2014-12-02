@@ -25,7 +25,7 @@ mainRobot(State,History,{X,Y},TerminationRequester,ID) ->
         invalid -> handleInvalid(State,History,{X,Y},TerminationRequester,ID);
         blocked -> handleBlocked(State,History,{X,Y},TerminationRequester,ID);
         {Content,Message} -> handleInfo(State,History,{X,Y},TerminationRequester,ID,Content,Message);
-        X -> io:fwrite(standard_error,"Robot ~w: Received unknown message: ~w\n",[ID,X])
+        X -> io:fwrite(standard_error,"Robot ~w: Received unknown message: ~w\n",[ID,X]), mainRobot(State,History,{X,Y},TerminationRequester,ID)
     after ?TIME_REC ->
         case State of
             terminate -> robotUtils:multiSend(TerminationRequester,{self(),ackTerminate}), terminated;
@@ -148,7 +148,7 @@ explore({X,Y}) ->
         ]).
 
 % Explore all the neighbours of the cell {X,Y}.
-% Move randomly toward one empty cell.
+% Move randomly toward one empty cell (prefer cells not yet visited by some robot).
 exploreAndMove(State,History,{X,Y},TerminationRequester,ID) ->
     ListPos = explore({X,Y}),
     ListNewPos = myLists:difference(ListPos,History),
