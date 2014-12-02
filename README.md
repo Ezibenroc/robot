@@ -1,7 +1,7 @@
 # Robots
 
-This program is a distributed robot mining simulator, writen in Erlang. It takes
-place in the curiculum of the Distributed Algorithm course of the ENS Lyon.
+This program is a distributed robot mining simulator, written in Erlang. It takes
+place in the curriculum of the Distributed Algorithm course of the ENS Lyon.
 
 Several robots are initialized on some map, containing free cells and blocks. Free
 cells may contain gold. Robots aim to collect gold as fast as possible, by performing
@@ -34,11 +34,11 @@ Quit the program:
 
     ctrl+C
 
-Some results (points scored, eventual runtime errors) are writen in the file `main.log`.
+Some results (points scored, eventual runtime errors) are written in the file `main.log`.
 
-#### Interractive mode
+#### Interactive mode
 
-This mode offer a user interface, which allow to query informations about the system
+This mode offer a user interface, which allow to query information about the system
 state, and to terminate properly the program.
 
 Run the program:
@@ -52,17 +52,17 @@ In a second terminal:
     make ui
 
 The first terminal now display the evolution of the map. The second terminal is an
-erlang shell offering some functions:
+Erlang shell offering some functions:
 
 * `ui:allNames()`   will display the name of all robots of the map.
 * `ui:printScore()` will display the different points scored by the robots till now.
 * `ui:terminate()`  will terminate properly the program.
 
-Some results (points scored, queries from the UI, eventual runtime errors) are writen in the file `main.log`.
+Some results (points scored, queries from the UI, eventual runtime errors) are written in the file `main.log`.
 
 #### Superarbiter
 
-The program is intended to run with some provided superabiter. It should work, but
+The program is intended to run with some provided superarbiter. It should work, but
 has not been tested. However, one can run the program with some dummy superarbiter:
 in the file `main.erl`, uncomment the line `register(superarbiter,spawn(main,superarbiter_loop,[])),`,
 then compile and run.
@@ -86,6 +86,6 @@ The robot will chose randomly among the cells where no robot have never been. If
 no such cell exist, it will chose randomly among all the free cells. If there is
 no free cell at all, it stays in place.
 
-Once the robot chosed a cell, it performs a move query to the arbiter, and informs
+Once the robot chose a cell, it performs a move query to the arbiter, and informs
 the other robots of this new action. By doing so, all robots know in real-time what
 cells have been visited.
