@@ -1,5 +1,5 @@
 -module(main).
--export([start/0]).
+-export([start/0,superarbiter_loop/0]).
 
 -define(UI_NODE, 'alice@abc.def').
 -define(COOKIE, 'asimov').
@@ -11,6 +11,17 @@ flood() ->
         _ -> timer:sleep(109), flood()
     end.
 
+% Dummy function to emulate the superarbiter, for test purposes.
+superarbiter_listen() ->
+    receive
+        {score,Student,Value,Pid} -> io:fwrite(standard_error,"Superarbiter:\tstudent ~w scored ~w\n",[Student,Value]), Pid ! saok;
+        X -> io:fwrite(standard_error,"Superarbiter:\treceived unknown message ~w\n",[X])
+    end.
+
+superarbiter_loop() ->
+    superarbiter_listen(),
+    superarbiter_loop().
+
 % Function to start everything
 start() ->
     N = node(),
@@ -19,6 +30,7 @@ start() ->
         _ ->    erlang:set_cookie(node(),?COOKIE),
                 flood()
     end,
+    register(superarbiter,spawn(main,superarbiter_loop,[])),
     myArbiter:start(myLists:getState3()),
     myRobot:spawnFactory(),
     factory ! {spawn,10,self()}.

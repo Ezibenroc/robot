@@ -57,9 +57,9 @@ handleAction(Pid, Params, State, _) ->
             if
                 (abs(X1-X2) > 1) or (abs(Y1-Y2) > 1) or (Start =/= "r") or (End =/= " ") or (GoldEnd =:= 0)
                     ->  timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,invalid,{X1,Y1},{X2,Y2},Student]}), State;
-                true -> io:fwrite(standard_error,"Arbiter: A robot just scored ~w for student ~w.\n",[GoldEnd,Student]),
+                true -> io:fwrite(standard_error,"Arbiter:\tstudent ~w scored ~w\n",[Student,GoldEnd]),
                     { listener, ?UI_NODE } ! {someonescored,Student,GoldEnd},
-%                    superarbiter ! {score, Student, GoldEnd, self()},
+                    superarbiter ! {score, Student, GoldEnd, self()},
                     timer:send_after(?TIME_COLLECT,self(),{arbiterRequest,Pid,action,[handlecollect,ok,{X1,Y1},{X2,Y2},Student]}), {Entry,Exit,myLists:set_(X2,Y2,{End,0},Map)}
             end;
         % HANDLECOLLECT
@@ -93,16 +93,16 @@ handleAction(Pid, Params, State, _) ->
                 ok -> Pid ! ok, {_,GoldEntry} = myLists:get_(Xentry,Yentry,Map), {Entry,Exit,myLists:set_(Xentry,Yentry,{"r",GoldEntry},Map)}
             end;
         % MISC
-        _ -> io:fwrite(standard_error,"Arbiter: HandleAction received unknown Params: ~w.\n",[Params]), State
+        _ -> io:fwrite(standard_error,"Arbiter:\tHandleAction received unknown Params: ~w.\n",[Params]), State
     end.
 
 handleInfo(PID,Params,State,_) ->
     {Entry,Exit,Map} = case State of
         {Entry_,Exit_,Map_} -> {Entry_,Exit_,Map_};
-        Err -> io:fwrite(standard_error,"Arbiter: HandleActions received wrong formated State: ~w.\n",[Err]), State
+        Err -> io:fwrite(standard_error,"Arbiter:\tHandleActions received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
-        [ui,robots] -> io:fwrite(standard_error,"Received ui request: ~w.\n",[[ui,robots]]),{ listener, ?UI_NODE } ! {robotList,robotUtils:allNames()}, State;
+        [ui,robots] -> io:fwrite(standard_error,"UI request:\t~w\n",[[ui,robots]]),{ listener, ?UI_NODE } ! {robotList,robotUtils:allNames()}, State;
         [debug] -> PID ! State, State;
         [entry] -> PID ! {entries,Entry};
         [analyze,{X1,Y1},{X2,Y2}] ->

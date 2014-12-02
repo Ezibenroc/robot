@@ -13,7 +13,7 @@ flood() ->
 
 listen() ->
     receive
-        {robotList,L} -> io:fwrite("Robot list:\n~w\n",[L]);
+        {robotList,L} -> io:fwrite("Robot list:\n"), lists:map(fun(X) -> io:fwrite("\t~w\n",[X]) end, L);
         {someonescored,Student,Score} -> io:fwrite("Student ~w scored ~w points.\n",[Student,Score]);
         X -> io:fwrite("Received unknown message: ~w\n",[X])
     end.
