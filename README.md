@@ -34,9 +34,7 @@ Quit the program:
 
     ctrl+C
 
-Observe results:
-
-    cat main.log
+Some results (points scored, eventual runtime errors) are writen in the file `main.log`.
 
 #### Interractive mode
 
@@ -60,6 +58,4 @@ erlang shell offering some functions:
 * `ui:printScore()` will display the different points scored by the robots till now.
 * `ui:terminate()`  will terminate properly the program.
 
-Observe results:
-
-    cat main.log
+Some results (points scored, queries from the UI, eventual runtime errors) are writen in the file `main.log`.
