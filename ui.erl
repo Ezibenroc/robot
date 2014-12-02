@@ -1,8 +1,7 @@
 -module(ui).
--export([start/0,allNames/0]).
+-export([start/0,allNames/0,listen_loop/0]).
 
 -define(ROBOT_NODE, 'bob@foo.bar').
--define(UI_NAME, user_interface).
 -define(COOKIE, 'asimov').
 
 flood() ->
@@ -12,15 +11,21 @@ flood() ->
         _ -> timer:sleep(100), flood()
     end.
 
-allNames() ->
-    { arbiter, ?ROBOT_NODE } ! {arbiterRequest,self(),info,[?UI_NAME,robots]},
+listen() ->
     receive
-        L -> L
-    after 100 -> io:fwrite(standard_error,"Arbiter does not respond.\n",[])
+        {robotList,L} -> io:fwrite("Robot list:\n~w\n",[L]);
+        X -> io:fwrite("Received unknown message: ~w\n",[X])
     end.
+
+listen_loop() ->
+    listen(),
+    listen_loop().
+
+allNames() ->
+    { arbiter, ?ROBOT_NODE } ! {arbiterRequest,self(),info,[ui,robots,node()]}.
 
 % Function to start the UI
 start() ->
     erlang:set_cookie(node(),?COOKIE),
     flood(),
-    register(?UI_NAME,self()).
+    register(listener,spawn(ui,listen_loop,[])).
