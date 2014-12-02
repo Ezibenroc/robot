@@ -1,3 +1,5 @@
+% Module for the robots: define all operations defining a robot behaviour.
+
 -module(myRobot).
 -import(robotUtils,[multiSend/2]).
 -export([spawnFactory/0,mainRobot/5,exploreCell/2,explore/1]).

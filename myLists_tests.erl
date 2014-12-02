@@ -1,3 +1,5 @@
+% Test module for the lists.
+
 -module(myLists_tests).
 -include_lib("eunit/include/eunit.hrl").
 

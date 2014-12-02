@@ -1,3 +1,6 @@
+% Module for some basic list operations.
+% Also contains some maps.
+
 -module(myLists).
 -include_lib("eunit/include/eunit.hrl").
 -export([set_/4,get_/3,difference/2,add/2,union/2,print/1,getMap1/0,getState1/0,getState2/0,getEntryPoints/0,getExitPoints/0,getState3/0,getState4/0]).

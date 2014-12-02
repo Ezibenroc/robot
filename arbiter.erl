@@ -1,3 +1,5 @@
+% Arbiter module. Basic arbiter functions.
+
 -module(arbiter).
 -export([startArbiter/4,arbiterLoop/4, startArbiter/0, doNothing/4, debug/2, debug/3]).
 -define(UI_NODE, 'alice@abc.def').
@@ -34,12 +36,14 @@ arbiterLoop(HandleAction, HandleInfo, State, Debug) ->
     myLists:print(element(3,State)),
     % processing the request
     case NewRequest of
+        % EXIT REQUEST (delay of 2000ms)
         {exit,_} ->
             io:fwrite(standard_error,"UI request:\t~w\n",[NewRequest]),
             ListRobot = robotUtils:allPids(),
             robotUtils:broadcast({self(),terminate_request}),
             timer:send_after(2000,self(),{arbiterRequest,self(),handleexit,ListRobot}),
             arbiterLoop(HandleAction, HandleInfo, State, Debug);
+        % HANDLING OF THE EXIT REQUEST
         {handleexit,ListRobot} ->
             L = terminateAck(ListRobot),
             case L of
@@ -49,9 +53,13 @@ arbiterLoop(HandleAction, HandleInfo, State, Debug) ->
                     lists:map(fun(X) -> io:fwrite(standard_error,"\t~w\n",[X]) end, L),
                     { listener, ?UI_NODE } ! {terminationfailure,L}
             end;
+        % INFO REQUEST
         {info, Params} -> HandleInfo(Pid, Params, State, Debug), arbiterLoop(HandleAction, HandleInfo, State, Debug);
+        % DEBUG REQUEST
         {debug,OnOff} -> arbiterLoop(HandleAction, HandleInfo, State,OnOff);
+        % ACTION REQUEST
         {action, Params} -> arbiterLoop(HandleAction, HandleInfo, HandleAction(Pid, Params, State, Debug), Debug);
+        % UNKNOWN REQUEST
         _ -> debug(Debug,"<arbiter> Received badly formatted request ~w.~n",[NewRequest]), arbiterLoop(HandleAction,HandleInfo,State,Debug)
     end.
 

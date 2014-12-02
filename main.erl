@@ -1,3 +1,4 @@
+% Main module to launch the arbiter, the factory, and start robots.
 -module(main).
 -export([start/0,superarbiter_loop/0]).
 

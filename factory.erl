@@ -1,3 +1,5 @@
+% Factory module. Basic functions to spawn robots.
+
 -module(factory).
 -export([spawnFactory/3,spawnLoop/3,test/2,killFactory/0]).
 
@@ -35,7 +37,6 @@ killFactory() ->
         Pid -> exit(Pid,kill)
     end.
 
-% WTF does it do ?
 test(Atom,Name) ->
     io:fwrite("<~s> ~s~n",[Name,Atom]),
     receive impossiblemessage717 -> haha after 10000 -> test(Atom,Name) end.
