@@ -18,7 +18,7 @@ listen(State) ->
     receive
         {robotList,L} -> io:fwrite("Robot list:\n"), print(L), State;
         {someonescored,Student,Score} -> [{Student,Score}|State];
-        printscore -> print(State), State;
+        printscore -> timer:sleep(1), print(State), State;
         terminationsuccess -> io:fwrite("Arbiter and robots successfully terminated.\n"), State;
         {terminationfailure,L} -> io:fwrite("Some robots did not respond to termination request:\n"),
             print(L), State;
