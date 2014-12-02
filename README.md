@@ -66,3 +66,26 @@ The program is intended to run with some provided superabiter. It should work, b
 has not been tested. However, one can run the program with some dummy superarbiter:
 in the file `main.erl`, uncomment the line `register(superarbiter,spawn(main,superarbiter_loop,[])),`,
 then compile and run.
+
+
+## Distributed algorithms
+
+We describe here the strategy used to efficiently find gold.
+
+Each time a robot has no available message, it scans its neighbour cells by sending
+info queries to the arbiter. This is more efficient than walking/mining a cell without
+knowledge, since an info query takes no time whereas an action query takes more than 250ms.
+
+When a robot detect gold, it collect it.
+
+Once the scan is terminated (and all the gold of the neighbour cells has been collected),
+the robot move to a free neighbour cell, and start this process again.
+
+The fundamental decision is the choice of such a free cell to move on.
+The robot will chose randomly among the cells where no robot have never been. If
+no such cell exist, it will chose randomly among all the free cells. If there is
+no free cell at all, it stays in place.
+
+Once the robot chosed a cell, it performs a move query to the arbiter, and informs
+the other robots of this new action. By doing so, all robots know in real-time what
+cells have been visited.
