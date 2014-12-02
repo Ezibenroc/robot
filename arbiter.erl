@@ -25,7 +25,6 @@ terminateAck(L) ->
     after 100 -> L end.
 
 arbiterLoop(HandleAction, HandleInfo, State, Debug) ->
-    io:fwrite("~w\n",[calendar:local_time()]),
     % receiving requests from users
     NewRequest = receive
         {arbiterRequest,Pid,Nature,Parameters} -> {Nature,Parameters}

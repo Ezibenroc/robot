@@ -1,7 +1,7 @@
 # Test module for the robots.
 
 all : arbiter.beam  factory.beam  myArbiter.beam myArbiter_tests.beam\
-myLists.beam  myLists_tests.beam robotFunctions.beam robotUtils.beam  test.beam\
+myLists.beam  myLists_tests.beam robotUtils.beam\
 myRobot.beam myRobot_tests.beam main.beam ui.beam\
 allTests.beam
 
