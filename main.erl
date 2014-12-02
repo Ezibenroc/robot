@@ -13,8 +13,12 @@ flood() ->
 
 % Function to start everything
 start() ->
-    erlang:set_cookie(node(),?COOKIE),
-    flood(),
+    N = node(),
+    case N of
+        'nonode@nohost' -> nope;
+        _ ->    erlang:set_cookie(node(),?COOKIE),
+                flood()
+    end,
     myArbiter:start(myLists:getState3()),
     myRobot:spawnFactory(),
     factory ! {spawn,10,self()}.
