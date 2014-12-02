@@ -7,8 +7,8 @@
 flood() ->
     X=net_adm:ping(?UI_NODE),
     case X of
-        pong -> io:fwrite("Connected to MAIN.\n");
-        _ -> timer:sleep(10), flood()
+        pong -> io:fwrite(standard_error,"Connected to UI.\n",[]);
+        _ -> timer:sleep(109), flood()
     end.
 
 % Function to start everything

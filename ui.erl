@@ -9,7 +9,7 @@ flood() ->
     X=net_adm:ping(?ROBOT_NODE),
     case X of
         pong -> io:fwrite("Connected to UI.\n");
-        _ -> timer:sleep(10), flood()
+        _ -> timer:sleep(100), flood()
     end.
 
 allNames() ->
