@@ -18,7 +18,7 @@
 handleAction(Pid, Params, State, _) ->
     {Entry,Exit,Map} = case State of
         {Entry_,Exit_,Map_} -> {Entry_,Exit_,Map_};
-        Err -> io:fwrite(standard_error,"Arboter: HandleActions received wrong formated State: ~w.\n",[Err]), State
+        Err -> io:fwrite(standard_error,"Arbiter: HandleActions received wrong formated State: ~w.\n",[Err]), State
     end,
     case Params of
         % MOVE
